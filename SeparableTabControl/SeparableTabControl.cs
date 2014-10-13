@@ -9,7 +9,7 @@ using System.Windows.Input;
 
 namespace SeparableTabControlTest
 {
-    class SeparableTabControl : TabControl
+    public class SeparableTabControl : TabControl
     {
         /// <summary>
         /// tabItem をウィンドウ化するときに、ウィンドウのタイトルに設定したい文字列を返す
