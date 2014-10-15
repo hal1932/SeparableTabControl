@@ -23,14 +23,14 @@ namespace SeparableTabControlTest
         private bool _isItemDragged;
 
 
-        private class TabItemMetadata
+        private class TabItemContainer
         {
             public int Index;
-            public object Header;
+            public TabItem TabItem;
         }
 
 
-        private Dictionary<object, TabItemMetadata> _metadataDic = new Dictionary<object, TabItemMetadata>();
+        private Dictionary<object, TabItemContainer> _containerCache = new Dictionary<object, TabItemContainer>();
 
 
         public SeparableTabControl()
@@ -98,7 +98,7 @@ namespace SeparableTabControlTest
                     Height = content.ActualHeight,
                     Title = title,
                     Content = content,
-                    Tag = _metadataDic[content],
+                    Tag = _containerCache[content],
                     Owner = Window.GetWindow(this),
                 };
                 window.PreviewMouseMove += window_PreviewMouseMove;
@@ -124,13 +124,13 @@ namespace SeparableTabControlTest
 
             // OnMouseLeave() でウィンドウ化した TabItem を TabControl の中に
             // 復帰させるときに使うデータを保管しておく
-            TabItemMetadata metadata;
-            if (!_metadataDic.TryGetValue(tabItem.Content, out metadata))
+            TabItemContainer metadata;
+            if (!_containerCache.TryGetValue(tabItem.Content, out metadata))
             {
-                _metadataDic[tabItem.Content] = new TabItemMetadata()
+                _containerCache[tabItem.Content] = new TabItemContainer()
                 {
                     Index = Items.IndexOf(tabItem),
-                    Header = tabItem.Header,
+                    TabItem = tabItem,
                 };
             }
         }
@@ -181,15 +181,11 @@ namespace SeparableTabControlTest
             var window = (Window)sender;
             var content = window.Content;
 
-            var metadata = _metadataDic[content];
+            var cache = _containerCache[content];
 
-            var tabItem = new TabItem()
-            {
-                Header = metadata.Header,
-                Content = content,
-            };
+            var tabItem = cache.TabItem;
 
-            var index = Math.Min(metadata.Index, Items.Count);
+            var index = Math.Min(cache.Index, Items.Count);
             Items.Insert(index, tabItem);
             SelectedIndex = index;
         }
